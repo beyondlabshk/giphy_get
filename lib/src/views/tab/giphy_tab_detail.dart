@@ -12,8 +12,7 @@ import 'package:provider/provider.dart';
 class GiphyTabDetail extends StatefulWidget {
   final String type;
   final ScrollController scrollController;
-  GiphyTabDetail({Key? key, required this.type, required this.scrollController})
-      : super(key: key);
+  GiphyTabDetail({Key? key, required this.type, required this.scrollController}) : super(key: key);
 
   @override
   _GiphyTabDetailState createState() => _GiphyTabDetailState();
@@ -90,8 +89,7 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
     _crossAxisCount = (MediaQuery.of(context).size.width / _gifWidth).round();
 
     // Set vertical max items count
-    int _mainAxisCount =
-        ((MediaQuery.of(context).size.height - 30) / _gifWidth).round();
+    int _mainAxisCount = ((MediaQuery.of(context).size.height - 30) / _gifWidth).round();
 
     _limit = _crossAxisCount * _mainAxisCount;
 
@@ -119,7 +117,7 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       // child: StaggeredGrid.countB
-      child: MasonryGridView.count(
+      child: StaggeredGridView.countBuilder(
         scrollDirection: _scrollDirection,
         controller: widget.scrollController,
         itemCount: _list.length,
@@ -130,13 +128,14 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
           GiphyGif _gif = _list[idx];
           return _item(_gif);
         },
+        staggeredTileBuilder: (idx) => StaggeredTile.fit(1),
       ),
     );
   }
 
   Widget _item(GiphyGif gif) {
-    double _aspectRatio = (double.parse(gif.images!.fixedWidth.width) /
-        double.parse(gif.images!.fixedWidth.height));
+    double _aspectRatio =
+        (double.parse(gif.images!.fixedWidth.width) / double.parse(gif.images!.fixedWidth.height));
 
     return ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
@@ -187,14 +186,12 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
 
   Future<void> _loadMore() async {
     //Return if is loading or no more gifs
-    if (_isLoading || _collection?.pagination?.totalCount == _list.length)
-      return;
+    if (_isLoading || _collection?.pagination?.totalCount == _list.length) return;
 
     _isLoading = true;
 
     // Giphy Client from library
-    GiphyClient client = GiphyClient(
-        apiKey: _tabProvider.apiKey, randomId: _tabProvider.randomID);
+    GiphyClient client = GiphyClient(apiKey: _tabProvider.apiKey, randomId: _tabProvider.randomID);
 
     // Offset pagination for query
     int offset;
@@ -209,8 +206,7 @@ class _GiphyTabDetailState extends State<GiphyTabDetail> {
       _collection = await client.emojis(offset: offset, limit: _limit);
     } else {
       // If query text is not null search gif else trendings
-      if (_appBarProvider.queryText.isNotEmpty &&
-          widget.type != GiphyType.emoji) {
+      if (_appBarProvider.queryText.isNotEmpty && widget.type != GiphyType.emoji) {
         _collection = await client.search(_appBarProvider.queryText,
             lang: _tabProvider.lang,
             offset: offset,
